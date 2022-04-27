@@ -39,4 +39,27 @@ namespace WG {
   void Motor::stop() {
     analogWrite(_enable, 0);
   }
+
+  static const uint8_t GPIO_PINS[] = {1, 6, 11, 13, 15, 17, 20};
+
+  GPIO::GPIO(uint8_t id) {
+    _pin = GPIO_PINS[id];
+  }
+
+  bool GPIO::get() {
+    _setPinMode(INPUT);
+    return digitalRead(_pin);
+  }
+
+  void GPIO::set(bool value) {
+    _setPinMode(OUTPUT);
+    digitalWrite(_pin, value);
+  }
+
+  inline void GPIO::_setPinMode(bool mode) {
+    if (mode != _pinMode) {
+      pinMode(_pin, mode);
+      _pinMode = mode;
+    }
+  }
 }

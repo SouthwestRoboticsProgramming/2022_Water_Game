@@ -1,20 +1,23 @@
 #include "waterlib.h"
 
 WG::Motor motor(0);
+WG::GPIO gpio(0);
 
 void setup() {
   WG::begin(2129);
 }
 
+inline void runInDirection(WG::MotorDirection dir) {
+  motor.setDirection(dir);
+  motor.setSpeed(255);
+  gpio.set(true);
+  delay(1000);
+  motor.setSpeed(0);
+  gpio.set(false);
+  delay(1000);
+}
+
 void loop() {
-  motor.setDirection(WG::MotorDirection::FORWARD);
-  motor.setSpeed(255);
-  delay(1000);
-  motor.stop();
-  delay(1000);
-  motor.setDirection(WG::MotorDirection::REVERSE);
-  motor.setSpeed(255);
-  delay(1000);
-  motor.stop();
-  delay(1000);
+  runInDirection(WG::MotorDirection::FORWARD);
+  runInDirection(WG::MotorDirection::REVERSE);
 }

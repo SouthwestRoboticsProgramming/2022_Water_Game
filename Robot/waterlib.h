@@ -27,6 +27,21 @@ namespace WG {
     private:
       uint8_t _positive, _negative, _enable;
   };
+
+  // GPIO
+  const uint8_t GPIO_COUNT = 7;
+  class GPIO {
+    public:
+      GPIO(uint8_t id);
+
+      bool get();
+      void set(bool);
+    private:
+      uint8_t _pin;
+      bool _pinMode;
+
+      inline void _setPinMode(bool mode);
+  };
 }
 
 #endif // ifndef INCLUDE_WATERLIB_H
