@@ -9,6 +9,14 @@ namespace WG {
   static const uint8_t MOTOR_POSITIVE[] = {0, 3, 21, 18};
   static const uint8_t MOTOR_NEGATIVE[] = {2, 5, 19, 16};
 
+  static Motor MOTORS[] = {
+    Motor(0), Motor(1), Motor(2), Motor(3)
+  };
+
+  Motor* getMotor(uint8_t id) {
+    return &MOTORS[id];
+  }
+
   Motor::Motor(uint8_t id) {
     _enable = MOTOR_ENABLE[id];
     _positive = MOTOR_POSITIVE[id];
@@ -41,6 +49,14 @@ namespace WG {
   }
 
   static const uint8_t GPIO_PINS[] = {1, 6, 11, 13, 15, 17, 20};
+
+  static GPIO GPIOS[] = {
+    GPIO(0), GPIO(1), GPIO(2), GPIO(3), GPIO(4), GPIO(5), GPIO(6)
+  };
+
+  GPIO* getGPIO(uint8_t id) {
+    return &GPIOS[id];
+  }
 
   GPIO::GPIO(uint8_t id) {
     _pin = GPIO_PINS[id];
