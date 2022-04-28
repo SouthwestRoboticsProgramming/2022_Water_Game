@@ -47,7 +47,7 @@ namespace WG {
   }
 
   bool GPIO::get() {
-    _setPinMode(INPUT);
+    _setPinMode(INPUT_PULLUP);
     return digitalRead(_pin);
   }
 
@@ -56,7 +56,7 @@ namespace WG {
     digitalWrite(_pin, value);
   }
 
-  inline void GPIO::_setPinMode(bool mode) {
+  inline void GPIO::_setPinMode(uint8_t mode) {
     if (mode != _pinMode) {
       pinMode(_pin, mode);
       _pinMode = mode;

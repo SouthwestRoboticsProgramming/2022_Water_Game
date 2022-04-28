@@ -38,9 +38,9 @@ namespace WG {
       void set(bool);
     private:
       uint8_t _pin;
-      bool _pinMode;
+      uint8_t _pinMode;
 
-      inline void _setPinMode(bool mode);
+      inline void _setPinMode(uint8_t mode);
   };
 }
 
