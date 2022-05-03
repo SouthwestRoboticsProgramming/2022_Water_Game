@@ -153,27 +153,33 @@ namespace WG {
       }
     }
     
-    int main() {
+    void setup() {
+      Serial.begin(9600);
+      
       robot = createRobot();
       robot->robotInit();
       enterState(RobotState::DISABLED);
+    }
 
-      while (true) {
-        switch (currentState) {
-          case RobotState::DISABLED:
-            robot->disabledPeriodic();
-            break;
-           case RobotState::TELEOP:
-            robot->teleopPeriodic();
-            break;
-        }
+    void loop() {
+      WG::Internal::readIncomingPackets();
+      
+      switch (currentState) {
+        case RobotState::DISABLED:
+          robot->disabledPeriodic();
+          break;
+        case RobotState::TELEOP:
+          robot->teleopPeriodic();
+          break;
       }
-    
-      return 0;
     }
   }
 }
 
-int main() {
-  return WG::Internal::main();
+void setup() {
+  WG::Internal::setup();
+}
+
+void loop() {
+  WG::Internal::loop();
 }

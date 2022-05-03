@@ -3,6 +3,7 @@
 
 #include <arduino.h>
 #include <Servo.h>
+#include "waternet.h"
 
 namespace WG {
   enum RobotState {
@@ -106,7 +107,8 @@ namespace WG {
     extern RobotState currentState;
     
     void enterState(RobotState state);
-    int main();
+    void setup();
+    void loop();
   }
 }
 
