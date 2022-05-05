@@ -80,7 +80,7 @@ namespace WG {
       GPIO(uint8_t id);
     private:
       uint8_t pin;
-      uint8_t currentPinMode, defaultPinMode;
+      uint8_t currentPinMode;
       void setPinMode(uint8_t);
 
     friend class GPIOServo;
@@ -90,15 +90,18 @@ namespace WG {
   const uint8_t GPIOSERVO_COUNT = 2;
   class GPIOServo {
     public:
-      // Angle in degrees from 0 to 180
-      void setAngle(uint8_t angle);
-
-      // Internal constructor
+      // Assigns a servo to a GPIO pin
       GPIOServo(GPIO*);
+      
+      // Angle in degrees from 0 to 180
+      // Note: An angle at the far extremes may not be
+      //       physically possible on your servo, causing
+      //       its motor to stall.
+      void setAngle(uint8_t angle);
     private:
+      GPIO* gpio;
       Servo servo;
   };
-  GPIOServo* getGPIOServo(uint8_t id);
 
   // Internal API, do not use!
   namespace Internal {

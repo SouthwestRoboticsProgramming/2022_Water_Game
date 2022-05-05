@@ -92,7 +92,7 @@ namespace WG {
 
   // TODO: Define actual pin numbers
   // Port 1 and 2 should pe PWM capable for servos
-  static const uint8_t GPIO_PINS[GPIO_COUNT] = {1, 1, 1, 1, 1, 1, 1};
+  static const uint8_t GPIO_PINS[GPIO_COUNT] = {1, 4, 1, 1, 1, 1, 1};
 
   GPIO::GPIO(uint8_t id) {
     pin = GPIO_PINS[id];
@@ -119,16 +119,8 @@ namespace WG {
 
   // --- GPIOServo -----------------------
 
-  static GPIOServo SERVOS[GPIOSERVO_COUNT] = {
-    GPIOServo(&GPIOS[0]), GPIOServo(&GPIOS[1])
-  };
-
-  GPIOServo* getGPIOServo(uint8_t id) {
-    return &SERVOS[id];
-  }
-
-  GPIOServo::GPIOServo(GPIO* gpio) {
-    servo.attach(gpio->pin);
+  GPIOServo::GPIOServo(GPIO* g) {
+    servo.attach(g->pin);
   }
 
   void GPIOServo::setAngle(uint8_t angle) {
@@ -155,6 +147,7 @@ namespace WG {
     
     void setup() {
       Serial.begin(9600);
+      pinMode(11, OUTPUT);
       
       robot = createRobot();
       robot->robotInit();
@@ -163,7 +156,8 @@ namespace WG {
 
     void loop() {
       WG::Internal::readIncomingPackets();
-      
+      robot->robotPeriodic();
+
       switch (currentState) {
         case RobotState::DISABLED:
           robot->disabledPeriodic();

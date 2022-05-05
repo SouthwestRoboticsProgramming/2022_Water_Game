@@ -17,17 +17,17 @@ class WaterGameRobot : public WG::RobotBase {
       controller = WG::getController(CONTROLLER_ID);
       motor = WG::getMotor(MOTOR_ID);
       gpio = WG::getGPIO(GPIO_ID);
-      servo = WG::getGPIOServo(SERVO_ID);
+      servo = new WG::GPIOServo(WG::getGPIO(SERVO_ID));
     }
 
-    void teleopPeriodic() {
+    void robotPeriodic() override {   
       if (controller->getButton(0)) {
         motor->setSpeed(255);
       } else {
         motor->stop();
       }
 
-      gpio->write(controller->getButton(1));
+//      gpio->write(controller->getButton(1));
 
       servo->setAngle(controller->getButton(2) ? 180 : 0);
     }

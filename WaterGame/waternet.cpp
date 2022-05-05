@@ -19,10 +19,12 @@ namespace WG {
     static ReadState readState;
 
     void panic(int i) {
-      digitalWrite(11, HIGH);
-      delay(i);
-      digitalWrite(11, LOW);
-      delay(i);
+      while (true) {
+        digitalWrite(11, HIGH);
+        delay(i);
+        digitalWrite(11, LOW);
+        delay(i);
+      }
     }
 
     void handlePacket() {
