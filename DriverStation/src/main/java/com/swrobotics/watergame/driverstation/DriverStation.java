@@ -1,18 +1,39 @@
 package com.swrobotics.watergame.driverstation;
 
 public class DriverStation {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         TetheredConnection conn = new TetheredConnection();
 
-        boolean on = false;
+        int i = 0;
+        boolean b = false;
         while (true) {
-            on = !on;
-            conn.sendTest(on);
+            conn.read();
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            Thread.sleep(10);
+
+            i++;
+            if (i == 100) {
+                i = 0;
+                b = !b;
+
+                conn.ping();
+                conn.sendControllerData(
+                        0,
+                        new boolean[] {
+                                b, false, b, false,
+                                false, false, false, false,
+                                false, false, false, false,
+                                false, false, false, false,
+                                false, false, false, false,
+                                false, false, false, false,
+                                false, false, false, false,
+                                false, false, false, false
+                        },
+                        new double[] {
+                                0, 0, 0, 0,
+                                0, 0, 0, 0
+                        }
+                );
             }
         }
     }

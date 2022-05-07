@@ -6,7 +6,7 @@
 #include "waternet.h"
 
 namespace WG {
-  enum RobotState {
+  enum RobotState : uint8_t {
     DISABLED,
     TELEOP
   };
@@ -14,7 +14,7 @@ namespace WG {
   
   class RobotBase {
     public:
-      RobotBase(int team);
+      RobotBase(uint16_t team);
 
       virtual void robotInit() {}
       virtual void robotPeriodic() {}
@@ -36,6 +36,7 @@ namespace WG {
 
       // Internal constructor
       Controller(uint8_t id);
+      void read(WG::Internal::PacketInControls*);
     private:
       uint32_t buttons;
       float axes[AXIS_COUNT];
@@ -105,7 +106,7 @@ namespace WG {
 
   // Internal API, do not use!
   namespace Internal {
-    extern int team;
+    extern uint16_t team;
     extern RobotBase* robot;
     extern RobotState currentState;
     

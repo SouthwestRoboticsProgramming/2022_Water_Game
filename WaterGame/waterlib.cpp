@@ -5,7 +5,7 @@ namespace WG {
     return WG::Internal::currentState;
   }
 
-  RobotBase::RobotBase(int team) {
+  RobotBase::RobotBase(uint16_t team) {
     WG::Internal::team = team;
   }
 
@@ -32,6 +32,13 @@ namespace WG {
 
   float Controller::getAxis(uint8_t id) {
     return axes[id];
+  }
+
+  void Controller::read(WG::Internal::PacketInControls* packet) {
+    buttons = packet->buttonMask;
+    for (int i = 0; i < AXIS_COUNT; i++) {
+      axes[i] = packet->axes[i] / 127.0f;
+    }
   }
 
   // --- Motor ---------------------------
@@ -128,7 +135,7 @@ namespace WG {
   }
 
   namespace Internal {
-    int team;
+    uint16_t team;
     RobotBase* robot;
     RobotState currentState;
     
