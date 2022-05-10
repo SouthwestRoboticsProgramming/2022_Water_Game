@@ -1,40 +1,45 @@
 package com.swrobotics.watergame.driverstation;
 
-public class DriverStation {
-    public static void main(String[] args) throws Exception {
-        TetheredConnection conn = new TetheredConnection();
+import com.swrobotics.watergame.driverstation.controller.ControllerManager;
+import com.swrobotics.watergame.driverstation.controller.KeyboardController;
+import imgui.app.Application;
+import imgui.app.Configuration;
 
-        int i = 0;
-        boolean b = false;
-        while (true) {
-            conn.read();
+import static imgui.ImGui.*;
 
-            Thread.sleep(10);
+public class DriverStation extends Application {
+    private ControllerManager controllerManager;
 
-            i++;
-            if (i == 100) {
-                i = 0;
-                b = !b;
+    public DriverStation() {
+        controllerManager = new ControllerManager();
+    }
 
-                conn.ping();
-                conn.sendControllerData(
-                        0,
-                        new boolean[] {
-                                b, false, b, false,
-                                false, false, false, false,
-                                false, false, false, false,
-                                false, false, false, false,
-                                false, false, false, false,
-                                false, false, false, false,
-                                false, false, false, false,
-                                false, false, false, false
-                        },
-                        new double[] {
-                                0, 0, 0, 0,
-                                0, 0, 0, 0
-                        }
-                );
-            }
-        }
+    @Override
+    public void configure(Configuration config) {
+        config.setTitle("Water Game Driver Station");
+    }
+
+    @Override
+    public void initWindow(Configuration config) {
+        super.initWindow(config);
+        controllerManager.addController(new KeyboardController(getHandle()));
+    }
+
+    @Override
+    protected void initImGui(Configuration config) {
+        super.initImGui(config);
+
+        styleColorsLight();
+    }
+
+    @Override
+    public void process() {
+        showDemoWindow();
+
+        controllerManager.showControllersWindow();
+    }
+
+    public static void main(String[] args) {
+        launch(new DriverStation());
     }
 }
