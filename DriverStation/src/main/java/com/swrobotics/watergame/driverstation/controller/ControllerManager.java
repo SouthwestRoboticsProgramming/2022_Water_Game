@@ -1,17 +1,21 @@
 package com.swrobotics.watergame.driverstation.controller;
 
+import com.swrobotics.watergame.driverstation.TetheredConnection;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import static imgui.ImGui.*;
 
 public class ControllerManager {
+    private static final int COUNT = 4;
+
     private final List<Controller> controllers;
     private int selection;
 
     public ControllerManager() {
         controllers = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < COUNT; i++) {
             controllers.add(new NullController());
         }
 
@@ -19,7 +23,38 @@ public class ControllerManager {
     }
 
     public void addController(Controller c) {
-        controllers.add(c);
+        for (int i = 0; i < COUNT; i++) {
+            if (controllers.get(i) instanceof NullController) {
+                controllers.set(i, c);
+                return;
+            }
+        }
+
+        System.out.println("Warning: Too many input devices!");
+    }
+
+    public void updateControllers() {
+        for (Controller c : controllers) {
+            c.update();
+        }
+    }
+
+    public void updateControllerData(TetheredConnection conn) {
+        for (int i = 0; i < controllers.size(); i++) {
+            Controller c = controllers.get(i);
+
+            if (c.needsUpdateDataToRobot()) {
+                boolean[] buttons = new boolean[c.getButtonCount()];
+                float[] axes = new float[c.getAxisCount()];
+
+                for (int j = 0; j < buttons.length; j++)
+                    buttons[j] = c.getButton(j);
+                for (int j = 0; j < axes.length; j++)
+                    axes[j] = c.getAxis(j);
+
+                conn.sendControllerData(i, buttons, axes);
+            }
+        }
     }
 
     public void showControllersWindow() {

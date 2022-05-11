@@ -27,6 +27,11 @@ public final class NullController implements Controller {
     }
 
     @Override
+    public void update() {
+
+    }
+
+    @Override
     public int getAxisCount() {
         return 0;
     }

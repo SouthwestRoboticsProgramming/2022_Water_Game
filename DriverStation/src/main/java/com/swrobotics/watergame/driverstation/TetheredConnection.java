@@ -152,7 +152,7 @@ public class TetheredConnection {
     }
 
     // Expects at most 32 buttons and 8 axes
-    public void sendControllerData(int controller, boolean[] buttons, double[] axes) {
+    public void sendControllerData(int controller, boolean[] buttons, float[] axes) {
         int buttonMask = 0;
         for (int i = 0; i < buttons.length; i++) {
             buttonMask |= buttons[i] ? 1 << i : 0;
@@ -169,7 +169,7 @@ public class TetheredConnection {
         data[4] = (byte) ((buttonMask & 0xFF000000) >> 24);
 
         for (int i = 0; i < 8; i++) {
-            double axis = i < axes.length ? axes[i] : 0;
+            float axis = i < axes.length ? axes[i] : 0;
             if (axis > 1) axis = 1;
             if (axis < -1) axis = -1;
 

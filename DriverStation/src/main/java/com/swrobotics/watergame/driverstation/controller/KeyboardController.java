@@ -53,6 +53,11 @@ public class KeyboardController implements Controller {
     }
 
     @Override
+    public void update() {
+
+    }
+
+    @Override
     public int getAxisCount() {
         return 0;
     }
@@ -107,7 +112,6 @@ public class KeyboardController implements Controller {
                 }
                 if (button(label, -Float.MIN_VALUE, 0.0f)) {
                     targetButton = i;
-                    System.out.println("it got clicked");
                 }
                 if (recolor)
                     popStyleColor();

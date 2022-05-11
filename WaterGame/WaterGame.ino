@@ -21,14 +21,8 @@ class WaterGameRobot : public WG::RobotBase {
     }
 
     void robotPeriodic() override { 
-      if (controller->getButton(0)) {
-        motor->setSpeed(255);
-      } else {
-        motor->stop();
-      }
-
       digitalWrite(11, controller->getButton(0));
-      servo->setAngle(controller->getButton(2) ? 170 : 10);
+      servo->setAngle((uint8_t) (controller->getAxis(5) * 80.0f + 90));
     }
 };
 

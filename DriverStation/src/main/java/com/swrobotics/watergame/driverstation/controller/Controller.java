@@ -7,6 +7,7 @@ public interface Controller {
     String getDescription();
 
     boolean needsUpdateDataToRobot();
+    void update();
 
     int getAxisCount();
     float getAxis(int index);
