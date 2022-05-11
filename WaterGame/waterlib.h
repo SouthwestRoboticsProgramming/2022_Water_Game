@@ -1,7 +1,7 @@
 #ifndef INCLUDE_WATERLIB_H
 #define INCLUDE_WATERLIB_H
 
-#include <arduino.h>
+#include <Arduino.h>
 #include <Servo.h>
 #include "waternet.h"
 

@@ -33,6 +33,13 @@ public class ControllerManager {
         System.out.println("Warning: Too many input devices!");
     }
 
+    public void removeController(Controller c) {
+        int index = controllers.indexOf(c);
+        if (index >= 0) {
+            controllers.set(index, new NullController());
+        }
+    }
+
     public void updateControllers() {
         for (Controller c : controllers) {
             c.update();

@@ -5,6 +5,9 @@
 #define GPIO_ID 0
 #define SERVO_ID 1
 
+#define LEFT_STICK_X 0
+#define LEFT_STICK_Y 1
+
 class WaterGameRobot : public WG::RobotBase {
   private:
     WG::Controller* controller;
@@ -21,8 +24,21 @@ class WaterGameRobot : public WG::RobotBase {
     }
 
     void robotPeriodic() override { 
-      digitalWrite(11, controller->getButton(0));
-      servo->setAngle((uint8_t) (controller->getAxis(5) * 80.0f + 90));
+      float stickX = controller->getAxis(LEFT_STICK_X);
+      float stickY = controller->getAxis(LEFT_STICK_Y);
+
+      uint8_t servoAngle = (uint8_t) (stickX * 80 + 90);
+      uint8_t motorSpeed = (uint8_t) (abs(stickY) * 255);      
+      WG::MotorDirection motorDirection;
+      if (stickY <= 0) {
+        motorDirection = WG::MotorDirection::FORWARD;
+      } else {
+        motorDirection = WG::MotorDirection::REVERSE;
+      }
+
+      servo->setAngle(servoAngle);
+      motor->setSpeed(motorSpeed);
+      motor->setDirection(motorDirection);
     }
 };
 
