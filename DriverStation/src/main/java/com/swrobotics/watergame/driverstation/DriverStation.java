@@ -86,6 +86,9 @@ public class DriverStation extends Application {
         Properties props = new Properties();
         controllerManager.savePreferences(props);
 
+        // Make sure robot is disabled
+        conn.updateState(RobotState.DISABLED);
+
         try {
             props.store(new FileWriter(PREFERENCES_FILE), "Water game driver station preferences");
         } catch (IOException e) {
