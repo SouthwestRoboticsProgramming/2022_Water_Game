@@ -79,12 +79,11 @@ namespace WG {
   void Motor::setDirection(MotorDirection direction) {
     switch (direction) {
       case MotorDirection::FORWARD:
-        digitalWrite(positive, HIGH);
         digitalWrite(negative, LOW);
+        digitalWrite(positive, HIGH);
         break;
       case MotorDirection::REVERSE:
         digitalWrite(positive, LOW);
-        digitalWrite(negative, HIGH);
         break;
     }
   }
