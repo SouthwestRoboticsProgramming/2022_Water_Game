@@ -52,49 +52,58 @@ namespace WG {
   }
 
   // TODO: Define actual pin numbers
-  static const uint8_t MOTOR_PINS_ENABLE  [MOTOR_COUNT] = {1, 1, 1, 1}; // Must be PWM capable
-  static const uint8_t MOTOR_PINS_POSITIVE[MOTOR_COUNT] = {1, 1, 1, 1};
+  static const uint8_t MOTOR_PINS_POSITIVE[MOTOR_COUNT] = {1, 1, 1, 1}; // Must be PWM capable
   static const uint8_t MOTOR_PINS_NEGATIVE[MOTOR_COUNT] = {1, 1, 1, 1};
+  static const uint8_t MOTOR_PINS_ENABLE  [MOTOR_COUNT] = {1, 1, 1, 1};
 
   Motor::Motor(uint8_t id) {
-    en       = MOTOR_PINS_ENABLE  [id];
     positive = MOTOR_PINS_POSITIVE[id];
     negative = MOTOR_PINS_NEGATIVE[id];
+    en       = MOTOR_PINS_ENABLE  [id];
 
-    pinMode(en, OUTPUT);
-    pinMode(positive, OUTPUT);
-    pinMode(negative, OUTPUT);
-
-    setDirection(MotorDirection::FORWARD);
-    stop();
     enabled = isRobotEnabled();
+    digitalWrite(en, enabled);
+
+    currentDirection = MotorDirection::FORWARD;
+    currentSpeed = 0;
+    updatePins();
   }
 
   void Motor::setSpeed(uint8_t speed) {
-    if (enabled) {
-      analogWrite(en, speed);
-    }
+    if (!enabled) return;
+    
+    currentSpeed = speed;
+    updatePins();
   }
 
   void Motor::setDirection(MotorDirection direction) {
-    switch (direction) {
+    if (!enabled) return;
+    
+    currentDirection = direction;
+    updatePins();
+  }
+
+  void Motor::updatePins() {
+    switch (currentDirection) {
       case MotorDirection::FORWARD:
+        analogWrite(positive, currentSpeed);
         digitalWrite(negative, LOW);
-        digitalWrite(positive, HIGH);
         break;
       case MotorDirection::REVERSE:
-        digitalWrite(positive, LOW);
+        analogWrite(positive, 255 - currentSpeed);
+        digitalWrite(negative, HIGH);
         break;
     }
   }
 
   void Motor::enable() {
     enabled = true;
+    digitalWrite(en, HIGH);
   }
 
   void Motor::disable() {
     enabled = false;
-    stop();
+    digitalWrite(en, LOW);
   }
 
   // --- GPIO ----------------------------

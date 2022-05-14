@@ -69,7 +69,10 @@ namespace WG {
       Motor(uint8_t id);
     private:
       uint8_t positive, negative, en;
+      uint8_t currentSpeed;
+      MotorDirection currentDirection;
       bool enabled;
+      void updatePins();
       void enable();
       void disable();
 
