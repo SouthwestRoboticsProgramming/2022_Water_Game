@@ -1,5 +1,6 @@
 package com.swrobotics.watergame.driverstation.controller;
 
+import java.util.Properties;
 import java.util.UUID;
 
 public interface Controller {
@@ -16,4 +17,7 @@ public interface Controller {
     boolean getButton(int index);
 
     void renderGuiContent();
+
+    default void loadPreferences(Properties p) {}
+    default void savePreferences(Properties p) {}
 }

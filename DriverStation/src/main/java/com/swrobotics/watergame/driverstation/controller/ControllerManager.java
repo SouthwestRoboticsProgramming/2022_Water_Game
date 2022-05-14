@@ -4,6 +4,7 @@ import com.swrobotics.watergame.driverstation.TetheredConnection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import static imgui.ImGui.*;
 
@@ -61,6 +62,18 @@ public class ControllerManager {
 
                 conn.sendControllerData(i, buttons, axes);
             }
+        }
+    }
+
+    public void loadPreferences(Properties props) {
+        for (Controller c : controllers) {
+            c.loadPreferences(props);
+        }
+    }
+
+    public void savePreferences(Properties props) {
+        for (Controller c : controllers) {
+            c.savePreferences(props);
         }
     }
 
