@@ -29,10 +29,6 @@ namespace WG {
   }
   
   namespace Internal {
-    static const int ERROR_CODE_INVALID_LEN = 1000;
-    static const int ERROR_CODE_INVALID_PACKET_ID = 500;
-    static const int ERROR_CODE_INCORRECT_LEN = 100;
-    
     static uint8_t readBuf[MAX_PACKET_LEN];
     static uint8_t readPtr;
     static uint8_t readLen;
@@ -42,21 +38,13 @@ namespace WG {
     enum ReadState { AWAIT_START, READ_LENGTH, READ_CONTENT };
     static ReadState readState;
 
-    void panic(int i) {
-      while (true) {
-        digitalWrite(11, HIGH);
-        delay(i);
-        digitalWrite(11, LOW);
-        delay(i);
-      }
-    }
-
-    #define CHECK_LEN(type) if (readLen != sizeof(type) + 1) panic(ERROR_CODE_INCORRECT_LEN)
+    #define CHECK_LEN(type) if (readLen != sizeof(type) + 1) {readState = ReadState::AWAIT_START; return; }
     #define DECODE_PACKET(type) (type*) (&readBuf[1])
     #define SEND_PACKET(packet, type) Serial.write(START_BYTE); Serial.write(sizeof(type)); Serial.write((uint8_t*) &packet, sizeof(type))
 
     static inline void handlePacketHello() {
-      if (readLen != 1) panic(ERROR_CODE_INCORRECT_LEN);
+      if (readLen != 1)
+        readState = ReadState::AWAIT_START;
     }
 
     static inline void handlePacketPing() {
@@ -104,20 +92,7 @@ namespace WG {
         case PacketTypeIn::CONTROLS:
           handlePacketControls();
           break;
-        default:
-          panic(ERROR_CODE_INVALID_PACKET_ID);
       }
-      
-//      if (packetId == PacketTypeIn::TEST) {
-//        if (readLen != sizeof(PacketInTest) + 1)
-//          panic(ERROR_CODE_INCORRECT_LEN);
-//
-//        PacketInTest* packet = (PacketInTest*) (&readBuf[1]);
-//
-//        digitalWrite(11, packet->led ? HIGH : LOW);
-//      } else {
-//        panic(ERROR_CODE_INVALID_PACKET_ID);
-//      }
     }
 
     void readIncomingPackets() {
@@ -133,8 +108,10 @@ namespace WG {
             break;
           case ReadState::READ_LENGTH:
             readLen = byteRead;
-            if (readLen > MAX_PACKET_LEN)
-              panic(ERROR_CODE_INVALID_LEN);
+            if (readLen > MAX_PACKET_LEN) {
+              readState = ReadState::AWAIT_START;
+              break;
+            }
             readPtr = 0;
             readState = ReadState::READ_CONTENT;
             break;

@@ -11,6 +11,7 @@ import static imgui.ImGui.*;
 public class DriverStation extends Application {
     private ControllerManager controllerManager;
     private TetheredConnection conn;
+    private OperationWindow operationWindow;
 
     public DriverStation() {
         controllerManager = new ControllerManager();
@@ -25,10 +26,12 @@ public class DriverStation extends Application {
     public void initWindow(Configuration config) {
         super.initWindow(config);
 
-        controllerManager.addController(new KeyboardController(getHandle()));
         new GLFWControllerHandler(getHandle(), controllerManager);
+        controllerManager.addController(new KeyboardController(getHandle()));
 
         conn = new TetheredConnection();
+
+        operationWindow = new OperationWindow(conn);
     }
 
     @Override
@@ -47,6 +50,7 @@ public class DriverStation extends Application {
 
         showDemoWindow();
         controllerManager.showControllersWindow();
+        operationWindow.showGui();
 
         if (begin("test")) {
             if (button("Ping"))

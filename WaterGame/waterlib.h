@@ -7,10 +7,11 @@
 
 namespace WG {
   enum RobotState : uint8_t {
-    DISABLED,
-    TELEOP
+    DISABLED = 0,
+    TELEOP = 1
   };
   RobotState getCurrentState();
+  inline bool isRobotEnabled() { return getCurrentState() == RobotState::TELEOP; }
   
   class RobotBase {
     public:
@@ -42,6 +43,11 @@ namespace WG {
       float axes[AXIS_COUNT];
   };
   Controller* getController(uint8_t id);
+
+  namespace Internal {
+    void enablePeripherals();
+    void disablePeripherals();
+  }
   
   enum MotorDirection {
     FORWARD,
@@ -62,7 +68,13 @@ namespace WG {
       // Internal constructor
       Motor(uint8_t id);
     private:
-      uint8_t positive, negative, enable;
+      uint8_t positive, negative, en;
+      bool enabled;
+      void enable();
+      void disable();
+
+    friend void WG::Internal::enablePeripherals();
+    friend void WG::Internal::disablePeripherals();
   };
   Motor* getMotor(uint8_t id);
 
@@ -100,8 +112,14 @@ namespace WG {
       //       its motor to stall.
       void setAngle(uint8_t angle);
     private:
-      GPIO* gpio;
+      uint8_t pin;
       Servo servo;
+      bool enabled;
+      void enable();
+      void disable();
+
+    friend void WG::Internal::enablePeripherals();
+    friend void WG::Internal::disablePeripherals();
   };
 
   // Internal API, do not use!

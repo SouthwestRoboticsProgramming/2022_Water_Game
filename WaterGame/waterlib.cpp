@@ -57,20 +57,23 @@ namespace WG {
   static const uint8_t MOTOR_PINS_NEGATIVE[MOTOR_COUNT] = {1, 1, 1, 1};
 
   Motor::Motor(uint8_t id) {
-    enable   = MOTOR_PINS_ENABLE  [id];
+    en       = MOTOR_PINS_ENABLE  [id];
     positive = MOTOR_PINS_POSITIVE[id];
     negative = MOTOR_PINS_NEGATIVE[id];
 
-    pinMode(enable, OUTPUT);
+    pinMode(en, OUTPUT);
     pinMode(positive, OUTPUT);
     pinMode(negative, OUTPUT);
 
     setDirection(MotorDirection::FORWARD);
     stop();
+    enabled = isRobotEnabled();
   }
 
   void Motor::setSpeed(uint8_t speed) {
-    analogWrite(enable, speed);
+    if (enabled) {
+      analogWrite(en, speed);
+    }
   }
 
   void Motor::setDirection(MotorDirection direction) {
@@ -86,6 +89,15 @@ namespace WG {
     }
   }
 
+  void Motor::enable() {
+    enabled = true;
+  }
+
+  void Motor::disable() {
+    enabled = false;
+    stop();
+  }
+
   // --- GPIO ----------------------------
 
   static GPIO GPIOS[GPIO_COUNT] = {
@@ -99,7 +111,7 @@ namespace WG {
 
   // TODO: Define actual pin numbers
   // Port 1 and 2 should pe PWM capable for servos
-  static const uint8_t GPIO_PINS[GPIO_COUNT] = {1, 4, 1, 1, 1, 1, 1};
+  static const uint8_t GPIO_PINS[GPIO_COUNT] = {4, 5, 1, 1, 1, 1, 1};
 
   GPIO::GPIO(uint8_t id) {
     pin = GPIO_PINS[id];
@@ -126,15 +138,45 @@ namespace WG {
 
   // --- GPIOServo -----------------------
 
+  static GPIOServo* SERVOS[2];
+
   GPIOServo::GPIOServo(GPIO* g) {
-    servo.attach(g->pin);
+    pin = g->pin;
+    enabled = isRobotEnabled();
+    if (enabled) {
+      servo.attach(pin);
+    }
+
+    if (SERVOS[0] == nullptr) {
+      SERVOS[0] = this;
+    } else {
+      SERVOS[1] = this;
+    }
   }
 
   void GPIOServo::setAngle(uint8_t angle) {
-    servo.write(angle);
+    if (enabled) {
+      servo.write(angle);
+    }
+  }
+
+  void GPIOServo::enable() {
+    if (!enabled) {
+      servo.attach(pin);
+    }
+    enabled = true;
+  }
+
+  void GPIOServo::disable() {
+    if (enabled) {
+      servo.detach();
+    }
+    enabled = false;
   }
 
   namespace Internal {
+    static const uint8_t RSL_PIN = 11;
+    
     uint16_t team;
     RobotBase* robot;
     RobotState currentState;
@@ -144,17 +186,44 @@ namespace WG {
       
       switch (state) {
         case RobotState::DISABLED:
+          disablePeripherals();
           robot->disabledInit();
           break;
         case RobotState::TELEOP:
+          enablePeripherals();
           robot->teleopInit();
           break;
+      }
+    }
+
+    void enablePeripherals() {
+      for (int i = 0; i < MOTOR_COUNT; i++) {
+        MOTORS[i].enable();
+      }
+
+      for (int i = 0; i < GPIOSERVO_COUNT; i++) {
+        if (SERVOS[i])
+          SERVOS[i]->enable();
+      }
+    }
+
+    void disablePeripherals() {
+      for (int i = 0; i < MOTOR_COUNT; i++) {
+        MOTORS[i].disable();
+      }
+
+      for (int i = 0; i < GPIOSERVO_COUNT; i++) {
+        if (SERVOS[i])
+          SERVOS[i]->disable();
       }
     }
     
     void setup() {
       Serial.begin(9600);
-      pinMode(11, OUTPUT);
+      pinMode(RSL_PIN, OUTPUT);
+
+      SERVOS[0] = nullptr;
+      SERVOS[1] = nullptr;
       
       robot = createRobot();
       robot->robotInit();
@@ -167,9 +236,11 @@ namespace WG {
 
       switch (currentState) {
         case RobotState::DISABLED:
+          digitalWrite(RSL_PIN, HIGH);
           robot->disabledPeriodic();
           break;
         case RobotState::TELEOP:
+          digitalWrite(RSL_PIN, millis() % 500 < 250);
           robot->teleopPeriodic();
           break;
       }

@@ -178,4 +178,12 @@ public class TetheredConnection {
 
         sendPacket(PACKET_OUT_CONTROLS, data);
     }
+
+    public void updateState(RobotState state) {
+        byte[] data = {
+                (byte) (state == RobotState.TELEOP ? 1 : 0)
+        };
+
+        sendPacket(PACKET_OUT_STATE, data);
+    }
 }
