@@ -12,23 +12,25 @@ class WaterGameRobot : public WG::RobotBase {
     WG::Controller* controller;
     WG::GPIOServo* servo;
     WG::GPIOServo* servo2;
+    WG::Motor* motor;
 
   public:
     WaterGameRobot() : RobotBase(2129) {
       controller = WG::getController(CONTROLLER_ID);
-      servo = new WG::GPIOServo(WG::getGPIO(SERVO_ID));
-      servo2 = new WG::GPIOServo(WG::getGPIO(SERVO2_ID));
+      motor = WG::getMotor(0);
     }
 
     void robotPeriodic() override { 
       float stickX = controller->getAxis(LEFT_STICK_X);
       float stickY = controller->getAxis(LEFT_STICK_Y);
-
-      uint8_t servoAngle = (uint8_t) (stickX * 80 + 90);
-      uint8_t servoAngle2 = (uint8_t) (stickY * 80 + 90);
-
-      servo->setAngle(servoAngle);
-      servo2->setAngle(servoAngle2);
+      
+      if (stickY > 0) {
+        motor->setSpeed((uint8_t) (stickY * 255));
+        motor->setDirection(WG::MotorDirection::REVERSE);
+      } else {
+        motor->setSpeed((uint8_t) (stickY * -255));
+        motor->setDirection(WG::MotorDirection::FORWARD);
+      }
     }
 };
 

@@ -13,18 +13,18 @@ namespace WG {
       index++;
       str++;
       if (index == 32) {
-        Serial.write(START_BYTE);
-        Serial.write(sizeof(WG::Internal::PacketOutLog));
-        Serial.write((uint8_t*) &packet, sizeof(WG::Internal::PacketOutLog));
+        NET_SERIAL.write(START_BYTE);
+        NET_SERIAL.write(sizeof(WG::Internal::PacketOutLog));
+        NET_SERIAL.write((uint8_t*) &packet, sizeof(WG::Internal::PacketOutLog));
         index = 0;
       }
     }
 
     if (index != 0) {
       packet.buf[index] = 0;
-      Serial.write(START_BYTE);
-      Serial.write(sizeof(WG::Internal::PacketOutLog));
-      Serial.write((uint8_t*) &packet, sizeof(WG::Internal::PacketOutLog));
+      NET_SERIAL.write(START_BYTE);
+      NET_SERIAL.write(sizeof(WG::Internal::PacketOutLog));
+      NET_SERIAL.write((uint8_t*) &packet, sizeof(WG::Internal::PacketOutLog));
     }
   }
   
@@ -40,7 +40,10 @@ namespace WG {
 
     #define CHECK_LEN(type) if (readLen != sizeof(type) + 1) {readState = ReadState::AWAIT_START; return; }
     #define DECODE_PACKET(type) (type*) (&readBuf[1])
-    #define SEND_PACKET(packet, type) Serial.write(START_BYTE); Serial.write(sizeof(type)); Serial.write((uint8_t*) &packet, sizeof(type))
+    #define SEND_PACKET(packet, type) \
+      NET_SERIAL.write(START_BYTE); \
+      NET_SERIAL.write(sizeof(type)); \
+      NET_SERIAL.write((uint8_t*) &packet, sizeof(type))
 
     static inline void handlePacketHello() {
       if (readLen != 1)
@@ -72,6 +75,26 @@ namespace WG {
       c->read(controls);
     }
 
+    static inline void handlePacketInitWifiUpload() {
+      CHECK_LEN(PacketInInitWifiUpload);
+      PacketInInitWifiUpload* packet = DECODE_PACKET(PacketInInitWifiUpload);
+      //if (packet->magic != WIFI_UPLOAD_MAGIC) {
+        // Packet must be a read error
+        //return;
+      //}
+
+      // Become a serial bridge
+      Serial.begin(SERIAL_BAUD);
+      while (true) {
+        if (Serial.available()) {
+          NET_SERIAL.write(Serial.read());
+        }
+        if (NET_SERIAL.available()) {
+          Serial.write(NET_SERIAL.read());
+        }
+      }
+    }
+
     #undef CHECK_LEN
     #undef DECODE_PACKET
     #undef SEND_PACKET
@@ -92,14 +115,19 @@ namespace WG {
         case PacketTypeIn::CONTROLS:
           handlePacketControls();
           break;
+        case PacketTypeIn::INIT_WIFI_UPLOAD:
+          handlePacketInitWifiUpload();
+          break;
       }
     }
 
+    long lastDataTimestamp = 0;
     void readIncomingPackets() {
-      if (!Serial) return;
-
-      while (Serial.available() > 0) {
-        byteRead = Serial.read();
+      digitalWrite(11, millis() - lastDataTimestamp < 100);
+      
+      while (NET_SERIAL.available() > 0) {
+        byteRead = NET_SERIAL.read();
+        lastDataTimestamp = millis();
 
         switch (readState) {
           case ReadState::AWAIT_START:

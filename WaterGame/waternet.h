@@ -19,6 +19,9 @@
  *   Send LOG if a message is to be logged
  */
 
+#define NET_SERIAL Serial1
+#define SERIAL_BAUD 115200
+
 namespace WG {
   // Send a string message to the driver station.
   // Try to avoid this as much as possible, as it consumes a lot of bandwidth
@@ -26,12 +29,16 @@ namespace WG {
   
   namespace Internal {
     const uint8_t MAX_PACKET_LEN = 64;
+
+    // To make sure the wifi upload packet is real and not just a read error
+    const uint32_t WIFI_UPLOAD_MAGIC = 0x7ABC045A;
     
     enum PacketTypeIn : uint8_t {
       HELLO = 0x00,
       PING = 0x01,
       STATE = 0x02,
-      CONTROLS = 0x03
+      CONTROLS = 0x03,
+      INIT_WIFI_UPLOAD = 0x04
     };
     enum PacketTypeOut : uint8_t {
       CHECK = 0x00,
@@ -50,6 +57,9 @@ namespace WG {
       uint8_t controllerId;
       uint32_t buttonMask;
       int8_t axes[8];
+    };
+    struct PacketInInitWifiUpload {
+      uint32_t magic;
     };
 
     struct PacketOutCheck {
