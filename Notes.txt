@@ -1,0 +1,11 @@
+Communication between driver station & robot:
+
+Deploying code requires physical USB connection (discourages people from hogging the test area)
+When in test mode robot hosts WiFi network for DS to join; control can be over serial or WiFi
+When in game mode robot and DS connect to field WiFi and WMS bridges the connections; can still control when tethered
+
+Most convenient event structure would be:
+1. Give teams time to build and program robot initially
+2. Let people test and tune robots
+3. Reflash WiFi modules with game mode firmware
+4. Run matches, teams can still modify code and test over USB
