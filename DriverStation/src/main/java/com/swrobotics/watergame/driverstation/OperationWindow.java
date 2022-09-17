@@ -3,10 +3,10 @@ package com.swrobotics.watergame.driverstation;
 import static imgui.ImGui.*;
 
 public class OperationWindow {
-    private final TetheredConnection conn;
+    private final NetworkedConnection conn;
     private RobotState currentState;
 
-    public OperationWindow(TetheredConnection conn) {
+    public OperationWindow(NetworkedConnection conn) {
         this.conn = conn;
         currentState = RobotState.DISABLED;
     }

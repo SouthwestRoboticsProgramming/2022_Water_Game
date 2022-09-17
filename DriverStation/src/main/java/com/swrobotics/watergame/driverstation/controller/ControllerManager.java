@@ -1,5 +1,6 @@
 package com.swrobotics.watergame.driverstation.controller;
 
+import com.swrobotics.watergame.driverstation.NetworkedConnection;
 import com.swrobotics.watergame.driverstation.TetheredConnection;
 
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class ControllerManager {
         }
     }
 
-    public void updateControllerData(TetheredConnection conn) {
+    public void updateControllerData(NetworkedConnection conn) {
         for (int i = 0; i < controllers.size(); i++) {
             Controller c = controllers.get(i);
 

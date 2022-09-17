@@ -17,7 +17,7 @@ public class DriverStation extends Application {
     private static final String PREFERENCES_FILE = "prefs.properties";
 
     private ControllerManager controllerManager;
-    private TetheredConnection conn;
+    private NetworkedConnection conn;
     private OperationWindow operationWindow;
 
     public DriverStation() {
@@ -36,7 +36,7 @@ public class DriverStation extends Application {
         new GLFWControllerHandler(getHandle(), controllerManager);
         controllerManager.addController(new KeyboardController(getHandle()));
 
-        conn = new TetheredConnection();
+        conn = new NetworkedConnection();
 
         operationWindow = new OperationWindow(conn);
 
@@ -71,6 +71,9 @@ public class DriverStation extends Application {
         if (begin("test")) {
             if (button("Ping"))
                 conn.ping();
+            if (button("Wifi upload")) {
+                conn.beginWifiUpload();
+            }
         }
         end();
 
